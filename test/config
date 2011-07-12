@@ -1,0 +1,6 @@
+[commands]
+simple = echo TEST_SIMPLE
+notmatching = fail
+args (\d+) (\d+) = echo {0} {1}
+notmatching2 = fail
+notfound = notfound

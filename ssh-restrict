@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+import ConfigParser
+import os
+import re
+import shlex
+import sys
+
+if len(sys.argv) != 2:
+    print >> sys.stderr, "Usage: ssh-restrict CONFIG"
+    sys.exit(1)
+
+try:
+    origcmd = os.environ["SSH_ORIGINAL_COMMAND"]
+except KeyError:
+    print >> sys.stderr, "ssh-restrict: $SSH_ORIGINAL_COMMAND is not set"
+    sys.exit(1)
+
+config = ConfigParser.RawConfigParser()
+config.readfp(open(sys.argv[1]))
+
+for pat, cmd in config.items("commands"):
+    m = re.match("^" + pat + "$", origcmd)
+    if m:
+        cmd = cmd.format(*m.groups())
+        cmdparts = shlex.split(cmd)
+        try:
+            os.execvp(cmdparts[0], cmdparts)
+        except OSError:
+            print >> sys.stderr, "ssh-restrict: command not found: %s" % \
+                                 cmdparts[0]
+            sys.exit(127)
+else:
+    print >> sys.stderr, "ssh-restrict: command not defined: %s" % (origcmd)
+    sys.exit(1)
