@@ -21,7 +21,7 @@ config.readfp(open(sys.argv[1]))
 for pat, cmd in config.items("commands"):
     m = re.match("^" + pat + "$", origcmd)
     if m:
-        cmd = cmd.format(*m.groups())
+        cmd = cmd % m.groups()
         cmdparts = shlex.split(cmd)
         try:
             os.execvp(cmdparts[0], cmdparts)
