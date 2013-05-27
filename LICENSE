@@ -1,4 +1,4 @@
-Copyright (c) 2011, Maximilian Gaß <mxey@mxey.net>
+Copyright (c) 2011, 2013, Maximilian Gaß <mxey@mxey.net>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -11,3 +11,9 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+The documentation is based on the documentation of http://github.com/derf/ssh-forcecommand, which is licensed as described below:
+
+Copyright (C) 2010,2011 by Daniel Friesel <derf@finalrewind.org>
+
+    0. You just DO WHAT THE FUCK YOU WANT TO.
