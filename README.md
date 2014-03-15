@@ -24,6 +24,7 @@ defining the allowed commands.
 
 The configuration file should look like this:
 
+    [commands]
     home = tar -C / -cf - home
     say (\w+) (\d+)= echo {1}. {0}
     
