@@ -30,6 +30,8 @@ The configuration file should look like this:
     
 When called with a command, ssh-restrict evaluates each command definition as a regular expression (bouding it with ^ and $). The first match is executed by inserting the matched values (parantheses on the left) into the expression on the right.
 
+Note: In case you want to use an equal sign or a colon in your regular expressions for command definitions (setting name) you have to use \x3d (=) respectively \x3a (:) because that are reserved by the configuration parser.
+
 If you are looking for a simpler tool that does not support parameters, take a look at [ssh-forcecommand](https://github.com/derf/ssh-forcecommand).
 
 ## Usage
