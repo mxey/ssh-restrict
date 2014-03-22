@@ -2,10 +2,5 @@
 simple = echo TEST_SIMPLE
 notmatching = fail
 args (\d+) (\d+) = echo {0} {1}
-match = echo match1
-print_int (\d+) = echo {0}
 notmatching2 = fail
-fail_def (\w=+) : echo {0}
-fail_com (\d+) = echo {1}
 notfound = notfound
-match = echo match2
