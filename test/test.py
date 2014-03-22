@@ -3,6 +3,7 @@ import os
 
 EXPECTED_RETURN_CODE_WRONG_USAGE = 3
 EXPECTED_RETURN_CODE_COMMAND_NOT_FOUND = 3
+EXPECTED_RETURN_CODE_INTERNAL_ERROR = 3
 
 def test_simple():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "simple"
@@ -19,3 +20,11 @@ def test_undefined():
 def test_notfound():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "notfound"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_WRONG_USAGE
+
+def test_regex_exception():
+    os.environ["SSH_ORIGINAL_COMMAND"] =  "badregex test"
+    assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
+
+def test_escape_exception():
+    os.environ["SSH_ORIGINAL_COMMAND"] =  "badescape"
+    assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR

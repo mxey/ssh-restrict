@@ -3,4 +3,6 @@ simple = echo TEST_SIMPLE
 notmatching = fail
 args (\d+) (\d+) = echo {0} {1}
 notmatching2 = fail
+badregex (\w=+) = echo {0}
 notfound = notfound
+badescape (\w\=+) = echo {0}
