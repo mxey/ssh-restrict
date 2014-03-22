@@ -28,3 +28,7 @@ def test_regex_exception():
 def test_escape_exception():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "badescape"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
+
+def test_command_formatting():
+    os.environ["SSH_ORIGINAL_COMMAND"] =  "badformatting 123"
+    assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
