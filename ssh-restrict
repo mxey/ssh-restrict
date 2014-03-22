@@ -8,6 +8,8 @@ import sys
 RETURN_CODE_WRONG_USAGE = 3
 RETURN_CODE_COMMAND_NOT_FOUND = 3
 
+CONFIG_SECTION_NAME_COMMANDS = "commands"
+
 if len(sys.argv) != 2:
     print >> sys.stderr, "Usage: ssh-restrict CONFIG"
     sys.exit(RETURN_CODE_WRONG_USAGE)
@@ -21,7 +23,7 @@ except KeyError:
 config = ConfigParser.RawConfigParser()
 config.readfp(open(sys.argv[1]))
 
-for pat, cmd in config.items("commands"):
+for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
     m = re.match("^" + pat + "$", origcmd)
     if m:
         cmd = cmd.format(*m.groups())
