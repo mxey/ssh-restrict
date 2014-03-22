@@ -5,15 +5,18 @@ import re
 import shlex
 import sys
 
+RETURN_CODE_WRONG_USAGE = 3
+RETURN_CODE_COMMAND_NOT_FOUND = 3
+
 if len(sys.argv) != 2:
     print >> sys.stderr, "Usage: ssh-restrict CONFIG"
-    sys.exit(1)
+    sys.exit(RETURN_CODE_WRONG_USAGE)
 
 try:
     origcmd = os.environ["SSH_ORIGINAL_COMMAND"]
 except KeyError:
     print >> sys.stderr, "ssh-restrict: $SSH_ORIGINAL_COMMAND is not set"
-    sys.exit(1)
+    sys.exit(RETURN_CODE_WRONG_USAGE)
 
 config = ConfigParser.RawConfigParser()
 config.readfp(open(sys.argv[1]))
@@ -28,7 +31,7 @@ for pat, cmd in config.items("commands"):
         except OSError:
             print >> sys.stderr, "ssh-restrict: command not found: %s" % \
                                  cmdparts[0]
-            sys.exit(127)
+            sys.exit(RETURN_CODE_COMMAND_NOT_FOUND)
 else:
     print >> sys.stderr, "ssh-restrict: command not defined: %s" % (origcmd)
-    sys.exit(1)
+    sys.exit(RETURN_CODE_WRONG_USAGE)

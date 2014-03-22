@@ -1,6 +1,9 @@
 from subprocess import check_output, call
 import os
 
+EXPECTED_RETURN_CODE_WRONG_USAGE = 3
+EXPECTED_RETURN_CODE_COMMAND_NOT_FOUND = 3
+
 def test_simple():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "simple"
     assert "TEST_SIMPLE\n" == check_output(["./ssh-restrict", "./test/config"])
@@ -11,8 +14,8 @@ def test_args():
 
 def test_undefined():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "undefined"
-    assert call(["./ssh-restrict", "./test/config"]) == 1
+    assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_COMMAND_NOT_FOUND
 
 def test_notfound():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "notfound"
-    assert call(["./ssh-restrict", "./test/config"]) == 127
+    assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_WRONG_USAGE
