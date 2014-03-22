@@ -13,6 +13,10 @@ def test_args():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "args 23 42"
     assert "23 42\n" == check_output(["./ssh-restrict", "./test/config"])
 
+def test_args_type_overwriting():
+    os.environ["SSH_ORIGINAL_COMMAND"] =  "args text 42"
+    assert "text 42\n" == check_output(["./ssh-restrict", "./test/config"])
+
 def test_undefined():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "undefined"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_COMMAND_NOT_FOUND
