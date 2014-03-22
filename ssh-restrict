@@ -7,8 +7,27 @@ import sys
 
 RETURN_CODE_WRONG_USAGE = 3
 RETURN_CODE_COMMAND_NOT_FOUND = 3
+RETURN_CODE_INTERNAL_ERROR = 3
 
 CONFIG_SECTION_NAME_COMMANDS = "commands"
+
+
+def match_command(pattern, command):
+    try:
+        return re.match("^" + pattern + "$", command)
+    except:
+        try:
+            if shlex.split(command)[0] == shlex.split(pattern)[0]:
+                print >> sys.stderr, \
+                      "ssh-restrict: failed to evaluate regex '%s' for command: %s" % \
+                      (pattern, command)
+                os._exit(RETURN_CODE_INTERNAL_ERROR)
+        except:
+            print >> sys.stderr, \
+                     "ssh-restrict: config analyzer failed for command definition '%s': %s" % \
+                     (pattern, sys.exc_info()[1])
+            sys.exit(RETURN_CODE_INTERNAL_ERROR)
+
 
 if len(sys.argv) != 2:
     print >> sys.stderr, "Usage: ssh-restrict CONFIG"
@@ -24,7 +43,7 @@ config = ConfigParser.RawConfigParser()
 config.readfp(open(sys.argv[1]))
 
 for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
-    m = re.match("^" + pat + "$", origcmd)
+    m = match_command(pat, origcmd)
     if m:
         cmd = cmd.format(*m.groups())
         cmdparts = shlex.split(cmd)
