@@ -11,6 +11,8 @@ RETURN_CODE_INTERNAL_ERROR = 3
 
 CONFIG_SECTION_NAME_COMMANDS = "commands"
 
+buffer_exception_uncritical = []
+
 
 def match_command(pattern, command):
     try:
@@ -23,10 +25,10 @@ def match_command(pattern, command):
                       (pattern, command, sys.exc_info()[1])
                 sys.exit(RETURN_CODE_INTERNAL_ERROR)
         except:
-            print >> sys.stderr, \
-                     "ssh-restrict: config analyzer failed for command definition '%s': %s" % \
-                     (pattern, sys.exc_info()[1])
-            sys.exit(RETURN_CODE_INTERNAL_ERROR)
+            buffer_exception_uncritical.append( \
+              "ssh-restrict: config analyzer failed for command definition '%s': %s" % \
+              (pattern, sys.exc_info()[1]) \
+            )
 
 def get_formatted_command_parts(command_template, command_match):
     try:
@@ -62,4 +64,7 @@ for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
             sys.exit(RETURN_CODE_COMMAND_NOT_FOUND)
 else:
     print >> sys.stderr, "ssh-restrict: command not defined: %s" % (origcmd)
+    if len(buffer_exception_uncritical) > 0:
+        print >> sys.stderr, "\n".join(buffer_exception_uncritical)
+        sys.exit(RETURN_CODE_INTERNAL_ERROR)
     sys.exit(RETURN_CODE_WRONG_USAGE)
