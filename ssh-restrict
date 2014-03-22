@@ -28,6 +28,14 @@ def match_command(pattern, command):
                      (pattern, sys.exc_info()[1])
             sys.exit(RETURN_CODE_INTERNAL_ERROR)
 
+def get_formatted_command_parts(command_template, command_match):
+    try:
+        return shlex.split(command_template.format(*command_match.groups()))
+    except:
+        print >> sys.stderr, "ssh-restrict: formatting command '%s' failed: %s" % \
+                             (command_template, sys.exc_info()[1])
+        sys.exit(RETURN_CODE_INTERNAL_ERROR)
+
 
 if len(sys.argv) != 2:
     print >> sys.stderr, "Usage: ssh-restrict CONFIG"
@@ -45,8 +53,7 @@ config.readfp(open(sys.argv[1]))
 for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
     m = match_command(pat, origcmd)
     if m:
-        cmd = cmd.format(*m.groups())
-        cmdparts = shlex.split(cmd)
+        cmdparts = get_formatted_command_parts(cmd, m)
         try:
             os.execvp(cmdparts[0], cmdparts)
         except OSError:
