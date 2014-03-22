@@ -7,15 +7,15 @@ EXPECTED_RETURN_CODE_INTERNAL_ERROR = 3
 
 def test_simple():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "simple"
-    assert "TEST_SIMPLE\n" == check_output(["./ssh-restrict", "./test/config"])
+    assert b"TEST_SIMPLE\n" == check_output(["./ssh-restrict", "./test/config"])
 
 def test_args():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "args 23 42"
-    assert "23 42\n" == check_output(["./ssh-restrict", "./test/config"])
+    assert b"23 42\n" == check_output(["./ssh-restrict", "./test/config"])
 
 def test_args_type_overwriting():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "args text 42"
-    assert "text 42\n" == check_output(["./ssh-restrict", "./test/config"])
+    assert b"text 42\n" == check_output(["./ssh-restrict", "./test/config"])
 
 def test_undefined():
     os.environ["SSH_ORIGINAL_COMMAND"] =  "undefined"
