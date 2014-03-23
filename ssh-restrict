@@ -17,9 +17,11 @@ buffer_exception_uncritical = []
 
 
 def match_command(pattern, command):
+    # noinspection PyBroadException
     try:
         return re.match("^" + pattern + "$", command)
     except:
+        # noinspection PyBroadException
         try:
             if shlex.split(command)[0] == shlex.split(pattern)[0]:
                 print >> sys.stderr, \
@@ -34,6 +36,7 @@ def match_command(pattern, command):
 
 
 def get_formatted_command_parts(command_template, command_match):
+    # noinspection PyBroadException
     try:
         return shlex.split(command_template.format(*command_match.groups()))
     except:
