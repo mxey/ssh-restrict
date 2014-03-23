@@ -44,7 +44,7 @@ if len(sys.argv) != 2:
     sys.exit(RETURN_CODE_WRONG_USAGE)
 
 try:
-    origcmd = os.environ["SSH_ORIGINAL_COMMAND"]
+    original_command = os.environ["SSH_ORIGINAL_COMMAND"]
 except KeyError:
     print >> sys.stderr, "ssh-restrict: $SSH_ORIGINAL_COMMAND is not set"
     sys.exit(RETURN_CODE_WRONG_USAGE)
@@ -52,18 +52,18 @@ except KeyError:
 config = ConfigParser.RawConfigParser()
 config.readfp(open(sys.argv[1]))
 
-for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
-    m = match_command(pat, origcmd)
-    if m:
-        cmdparts = get_formatted_command_parts(cmd, m)
+for config_pattern, config_command in config.items(CONFIG_SECTION_NAME_COMMANDS):
+    match_results = match_command(config_pattern, original_command)
+    if match_results:
+        command_parts = get_formatted_command_parts(config_command, match_results)
         try:
-            os.execvp(cmdparts[0], cmdparts)
+            os.execvp(command_parts[0], command_parts)
         except OSError:
             print >> sys.stderr, "ssh-restrict: command not found: %s" % \
-                                 cmdparts[0]
+                                 command_parts[0]
             sys.exit(RETURN_CODE_COMMAND_NOT_FOUND)
 else:
-    print >> sys.stderr, "ssh-restrict: command not defined: %s" % (origcmd)
+    print >> sys.stderr, "ssh-restrict: command not defined: %s" % (original_command)
     if len(buffer_exception_uncritical) > 0:
         print >> sys.stderr, "\n".join(buffer_exception_uncritical)
         sys.exit(RETURN_CODE_INTERNAL_ERROR)
