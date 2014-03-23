@@ -2,5 +2,9 @@
 simple = echo TEST_SIMPLE
 notmatching = fail
 args (\d+) (\d+) = echo {0} {1}
+args (\w+) (\d+) = echo {0} {1}
 notmatching2 = fail
+badescape (\w\=+) = echo {0}
+badregex (\w=+) = echo {0}
+badformatting (\d+) = echo {1}
 notfound = notfound

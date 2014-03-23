@@ -5,30 +5,66 @@ import re
 import shlex
 import sys
 
+RETURN_CODE_WRONG_USAGE = 3
+RETURN_CODE_COMMAND_NOT_FOUND = 3
+RETURN_CODE_INTERNAL_ERROR = 3
+
+CONFIG_SECTION_NAME_COMMANDS = "commands"
+
+buffer_exception_uncritical = []
+
+
+def match_command(pattern, command):
+    try:
+        return re.match("^" + pattern + "$", command)
+    except:
+        try:
+            if shlex.split(command)[0] == shlex.split(pattern)[0]:
+                print >> sys.stderr, \
+                      "ssh-restrict: failed to evaluate regex '%s' for command '%s': %s" % \
+                      (pattern, command, sys.exc_info()[1])
+                sys.exit(RETURN_CODE_INTERNAL_ERROR)
+        except:
+            buffer_exception_uncritical.append( \
+              "ssh-restrict: config analyzer failed for command definition '%s': %s" % \
+              (pattern, sys.exc_info()[1]) \
+            )
+
+def get_formatted_command_parts(command_template, command_match):
+    try:
+        return shlex.split(command_template.format(*command_match.groups()))
+    except:
+        print >> sys.stderr, "ssh-restrict: formatting command '%s' failed: %s" % \
+                             (command_template, sys.exc_info()[1])
+        sys.exit(RETURN_CODE_INTERNAL_ERROR)
+
+
 if len(sys.argv) != 2:
     print >> sys.stderr, "Usage: ssh-restrict CONFIG"
-    sys.exit(1)
+    sys.exit(RETURN_CODE_WRONG_USAGE)
 
 try:
     origcmd = os.environ["SSH_ORIGINAL_COMMAND"]
 except KeyError:
     print >> sys.stderr, "ssh-restrict: $SSH_ORIGINAL_COMMAND is not set"
-    sys.exit(1)
+    sys.exit(RETURN_CODE_WRONG_USAGE)
 
 config = ConfigParser.RawConfigParser()
 config.readfp(open(sys.argv[1]))
 
-for pat, cmd in config.items("commands"):
-    m = re.match("^" + pat + "$", origcmd)
+for pat, cmd in config.items(CONFIG_SECTION_NAME_COMMANDS):
+    m = match_command(pat, origcmd)
     if m:
-        cmd = cmd.format(*m.groups())
-        cmdparts = shlex.split(cmd)
+        cmdparts = get_formatted_command_parts(cmd, m)
         try:
             os.execvp(cmdparts[0], cmdparts)
         except OSError:
             print >> sys.stderr, "ssh-restrict: command not found: %s" % \
                                  cmdparts[0]
-            sys.exit(127)
+            sys.exit(RETURN_CODE_COMMAND_NOT_FOUND)
 else:
     print >> sys.stderr, "ssh-restrict: command not defined: %s" % (origcmd)
-    sys.exit(1)
+    if len(buffer_exception_uncritical) > 0:
+        print >> sys.stderr, "\n".join(buffer_exception_uncritical)
+        sys.exit(RETURN_CODE_INTERNAL_ERROR)
+    sys.exit(RETURN_CODE_WRONG_USAGE)
