@@ -1,10 +1,10 @@
 [commands]
 simple = echo TEST_SIMPLE
-notmatching = fail
+not_matching = fail
 args (\d+) (\d+) = echo {0} {1}
 args (\w+) (\d+) = echo {0} {1}
-notmatching2 = fail
-badescape (\w\=+) = echo {0}
-badregex (\w=+) = echo {0}
-badformatting (\d+) = echo {1}
-notfound = notfound
+not_matching2 = fail
+bad_escape (\w\=+) = echo {0}
+bad_regex (\w=+) = echo {0}
+bad_formatting (\d+) = echo {1}
+not_found = not_found

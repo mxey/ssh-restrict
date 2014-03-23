@@ -28,21 +28,21 @@ def test_undefined():
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_COMMAND_NOT_FOUND
 
 
-def test_notfound():
-    os.environ["SSH_ORIGINAL_COMMAND"] = "notfound"
+def test_not_found():
+    os.environ["SSH_ORIGINAL_COMMAND"] = "not_found"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_WRONG_USAGE
 
 
 def test_regex_exception():
-    os.environ["SSH_ORIGINAL_COMMAND"] = "badregex test"
+    os.environ["SSH_ORIGINAL_COMMAND"] = "bad_regex test"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
 
 
 def test_escape_exception():
-    os.environ["SSH_ORIGINAL_COMMAND"] = "badescape"
+    os.environ["SSH_ORIGINAL_COMMAND"] = "bad_escape"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
 
 
 def test_command_formatting():
-    os.environ["SSH_ORIGINAL_COMMAND"] = "badformatting 123"
+    os.environ["SSH_ORIGINAL_COMMAND"] = "bad_formatting 123"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
