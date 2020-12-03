@@ -8,3 +8,4 @@ bad_escape (\w\=+) = echo {0}
 bad_regex (\w=+) = echo {0}
 bad_formatting (\d+) = echo {1}
 not_found = not_found
+UpperLower = echo UpperLower

@@ -56,6 +56,8 @@ except KeyError:
     sys.exit(RETURN_CODE_WRONG_USAGE)
 
 config = ConfigParser.RawConfigParser()
+# Override `optionxform` to bypass conversion of keys to lowercase
+config.optionxform = lambda option: option
 config.readfp(open(sys.argv[1]))
 
 for config_pattern, config_command in config.items(CONFIG_SECTION_NAME_COMMANDS):
