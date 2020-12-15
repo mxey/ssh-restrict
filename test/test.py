@@ -46,3 +46,7 @@ def test_escape_exception():
 def test_command_formatting():
     os.environ["SSH_ORIGINAL_COMMAND"] = "bad_formatting 123"
     assert call(["./ssh-restrict", "./test/config"]) == EXPECTED_RETURN_CODE_INTERNAL_ERROR
+
+def test_upper_lower():
+    os.environ["SSH_ORIGINAL_COMMAND"] = "UpperLower"
+    assert b"UpperLower\n" == check_output(["./ssh-restrict", "./test/config"])
