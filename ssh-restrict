@@ -1,11 +1,16 @@
 #!/usr/bin/env python
-import ConfigParser
+
 import shlex
 import sys
 
 import os
 import re
 
+# import for python 2 and python 3
+try:
+    import ConfigParser as configparser
+except ImportError:
+    import configparser
 
 RETURN_CODE_WRONG_USAGE = 3
 RETURN_CODE_COMMAND_NOT_FOUND = 3
@@ -15,6 +20,8 @@ CONFIG_SECTION_NAME_COMMANDS = "commands"
 
 buffer_exception_uncritical = []
 
+def alert(message):
+    sys.stderr.write(message + "\n")
 
 def match_command(pattern, command):
     # noinspection PyBroadException
@@ -24,9 +31,10 @@ def match_command(pattern, command):
         # noinspection PyBroadException
         try:
             if shlex.split(command)[0] == shlex.split(pattern)[0]:
-                print >> sys.stderr, \
+                alert( \
                     "ssh-restrict: failed to evaluate regex '%s' for command '%s': %s" % \
-                    (pattern, command, sys.exc_info()[1])
+                    (pattern, command, sys.exc_info()[1]) \
+                )
                 sys.exit(RETURN_CODE_INTERNAL_ERROR)
         except:
             buffer_exception_uncritical.append(
@@ -40,22 +48,23 @@ def get_formatted_command_parts(command_template, command_match):
     try:
         return shlex.split(command_template.format(*command_match.groups()))
     except:
-        print >> sys.stderr, "ssh-restrict: formatting command '%s' failed: %s" % \
-                             (command_template, sys.exc_info()[1])
+        alert("ssh-restrict: formatting command '%s' failed: %s" % \
+            (command_template, sys.exc_info()[1])
+        )
         sys.exit(RETURN_CODE_INTERNAL_ERROR)
 
 
 if len(sys.argv) != 2:
-    print >> sys.stderr, "Usage: ssh-restrict CONFIG"
+    alert("Usage: ssh-restrict CONFIG")
     sys.exit(RETURN_CODE_WRONG_USAGE)
 
 try:
     original_command = os.environ["SSH_ORIGINAL_COMMAND"]
 except KeyError:
-    print >> sys.stderr, "ssh-restrict: $SSH_ORIGINAL_COMMAND is not set"
+    alert("ssh-restrict: $SSH_ORIGINAL_COMMAND is not set")
     sys.exit(RETURN_CODE_WRONG_USAGE)
 
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 # Override `optionxform` to bypass conversion of keys to lowercase
 config.optionxform = lambda option: option
 config.readfp(open(sys.argv[1]))
@@ -67,12 +76,11 @@ for config_pattern, config_command in config.items(CONFIG_SECTION_NAME_COMMANDS)
         try:
             os.execvp(command_parts[0], command_parts)
         except OSError:
-            print >> sys.stderr, "ssh-restrict: command not found: %s" % \
-                                 command_parts[0]
+            alert("ssh-restrict: command not found: %s" % command_parts[0])
             sys.exit(RETURN_CODE_COMMAND_NOT_FOUND)
 else:
-    print >> sys.stderr, "ssh-restrict: command not defined: %s" % original_command
+    alert("ssh-restrict: command not defined: %s" % original_command)
     if len(buffer_exception_uncritical) > 0:
-        print >> sys.stderr, "\n".join(buffer_exception_uncritical)
+        alert("\n".join(buffer_exception_uncritical))
         sys.exit(RETURN_CODE_INTERNAL_ERROR)
     sys.exit(RETURN_CODE_WRONG_USAGE)

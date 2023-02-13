@@ -1,0 +1,48 @@
+# -----------------------------------------------------------------------------
+# Run test 
+# Author: Urs Roesch https://github.com/uroesch
+# Version: 0.1.0
+# -----------------------------------------------------------------------------
+name: pytest_ssh-restrict
+
+on:
+  push:
+    branches:
+    - workflow/*
+  pull_request:
+    branches:
+    - master
+    - main 
+
+jobs:
+  pytest_ssh-restrict:
+    timeout-minutes: 15
+    #runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: python:${{ matrix.python }}
+    strategy:
+      matrix:
+        python:
+          - '2.7'
+          - '3.3'
+          - '3.4'
+          - '3.5'
+          - '3.6'
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install pytest
+      shell: bash
+      run: pip install pytest
+
+    - name: Test ssh-restrict
+      shell: bash
+      run: pytest test/test.py
